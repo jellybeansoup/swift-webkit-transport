@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+
+  iOS:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tests
+        run: |
+          xcodebuild test \
+            -scheme swift-webkit-transport \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -derivedDataPath .build \
+            -enableCodeCoverage YES \
+            -resultBundlePath "Results"
+
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: Results.xcresult
+          path: Results.xcresult
+          retention-days: 90
