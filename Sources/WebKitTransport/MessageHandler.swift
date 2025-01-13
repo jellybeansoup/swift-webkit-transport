@@ -1,5 +1,6 @@
 import Foundation
 import WebKit
+import os.log
 
 final class MessageHandler: NSObject, WKScriptMessageHandler {
 
@@ -10,6 +11,8 @@ final class MessageHandler: NSObject, WKScriptMessageHandler {
 	private let userContentController: WKUserContentController
 
 	private let continuation: AsyncStream<WebKitTask.Payload>.Continuation
+
+	let logger = Logger(subsystem: "com.jellystyle.WebKitTransport", category: "MessageHandler")
 
 	init(
 		for userContentController: WKUserContentController,
@@ -49,25 +52,25 @@ final class MessageHandler: NSObject, WKScriptMessageHandler {
 
 		let data = Data(body.utf8)
 
-		do {
 			switch message.name {
 			case "document":
 				continuation.yield((data, documentResponse))
 
 			case "xhr":
-				let xhr = try JSONDecoder().decode(Message.self, from: data)
+				do {
+					let xhr = try JSONDecoder().decode(Message.self, from: data)
 
-				if let xhrResponse = xhr.urlResponse {
-					continuation.yield((xhr.body, xhrResponse))
+					if let xhrResponse = xhr.urlResponse {
+						continuation.yield((xhr.body, xhrResponse))
+					}
+				}
+				catch {
+					logger.error("Error handling '\(message.name)' message: \(body): \(error)")
 				}
 
 			default:
-				print("\(message.name): \(message.body)")
+				logger.notice("Received unexpected message '\(message.name)' message: \(body)")
 			}
-		}
-		catch {
-			print("Error handling '\(message.name)' message: \(message.body)")
-		}
 	}
 
 	// MARK: Javascript
