@@ -57,12 +57,11 @@ public struct WebKitTask: AsyncSequence, Sendable {
 
 	private static func stopLoading(_ viewController: ViewController, after seconds: TimeInterval) -> Task<Void, Never> {
 		Task.detached { [weak viewController] in
-			let nanoseconds = UInt64(seconds * 1_000_000_000)
-
-			if #available(iOS 16.0, *) {
-				try? await Task.sleep(for: .nanoseconds(nanoseconds))
+			if #available(iOS 16.0, macOS 13.0, *) {
+				try? await Task.sleep(for: .seconds(seconds))
 			}
 			else {
+				let nanoseconds = UInt64(seconds * 1_000_000_000)
 				try? await Task.sleep(nanoseconds: nanoseconds)
 			}
 

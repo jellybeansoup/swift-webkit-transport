@@ -1,8 +1,8 @@
+#if canImport(UIKit)
 import UIKit
 import WebKit
 
-@MainActor
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
 
 	/// The window that the `WebViewController` appears in.
 	lazy var window: UIWindow = {
@@ -77,3 +77,4 @@ class ViewController: UIViewController {
 	}
 
 }
+#endif

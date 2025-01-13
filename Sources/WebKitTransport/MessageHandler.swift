@@ -1,7 +1,7 @@
 import Foundation
 import WebKit
 
-class MessageHandler: NSObject, WKScriptMessageHandler {
+final class MessageHandler: NSObject, WKScriptMessageHandler {
 
 	let messages: AsyncStream<WebKitTask.Payload>
 
