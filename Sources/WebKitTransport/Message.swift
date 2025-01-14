@@ -24,7 +24,7 @@ struct Message: Decodable {
 
 	// MARK: Decodable
 
-	private enum CodingKeys: CodingKey {
+	enum CodingKeys: CodingKey {
 		case url
 		case status
 		case headers
@@ -37,7 +37,7 @@ struct Message: Decodable {
 		var headers: [String: String] = [:]
 		var version = "HTTP/1.1"
 		for line in try container.decode(String.self, forKey: .headers).split(separator: "\r\n") {
-			let components = line.split(separator: ":")
+			let components = line.split(separator: ":", omittingEmptySubsequences: false)
 
 			let key: String
 			let value: String

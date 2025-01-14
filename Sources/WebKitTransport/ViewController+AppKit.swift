@@ -22,14 +22,13 @@ final class ViewController: NSViewController {
 	lazy var webView: WKWebView = loadWebView()
 
 	private func loadWebView() -> WKWebView {
-		let webView = WKWebView()
+		let configuration = WKWebViewConfiguration()
+		configuration.applicationNameForUserAgent = "WebKitTransport"
+		configuration.mediaTypesRequiringUserActionForPlayback = .all
+		configuration.suppressesIncrementalRendering = true
+		configuration.websiteDataStore = .nonPersistent()
 
-		webView.configuration.applicationNameForUserAgent = "GIFwrapped"
-		webView.configuration.mediaTypesRequiringUserActionForPlayback = .all
-		webView.configuration.suppressesIncrementalRendering = true
-		webView.configuration.websiteDataStore = .nonPersistent()
-
-		return webView
+		return WKWebView(frame: .zero, configuration: configuration)
 	}
 
 	// MARK: View controller overrides
@@ -40,7 +39,7 @@ final class ViewController: NSViewController {
 
 	// MARK: Loading content
 
-	private var messageHandler: MessageHandler!
+	private(set) var messageHandler: MessageHandler!
 
 	func load(data: Data, response: URLResponse) -> AsyncStream<WebKitTask.Payload> {
 		messageHandler = MessageHandler(
@@ -48,7 +47,7 @@ final class ViewController: NSViewController {
 			using: response
 		)
 
-		window.setFrame(NSRect(x: 0, y: 0, width: 320.0, height: 568.0 * 3), display: true, animate: false)
+		window.setFrame(NSRect(x: -320.0, y: 0, width: 320.0, height: 568.0 * 3), display: true, animate: false)
 		webView.load(
 			data,
 			mimeType: response.mimeType ?? "text/html",

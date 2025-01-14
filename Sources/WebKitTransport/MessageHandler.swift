@@ -47,30 +47,41 @@ final class MessageHandler: NSObject, WKScriptMessageHandler {
 
 	func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
 		guard let body = message.body as? String else {
+			// NOTE: this enables the capture of empty messages, should they be
+			// sent, which makes things easier to debug. It should not be seen
+			// in the wild, as the messages that may be received are fixed.
+			logger.notice("Received invalid type (\(type(of: message.body))) for message '\(message.name)'.")
+
 			return
 		}
 
 		let data = Data(body.utf8)
 
-			switch message.name {
-			case "document":
-				continuation.yield((data, documentResponse))
+		switch message.name {
+		case "document":
+			continuation.yield((data, documentResponse))
 
-			case "xhr":
-				do {
-					let xhr = try JSONDecoder().decode(Message.self, from: data)
+		case "xhr":
+			do {
+				let xhr = try JSONDecoder().decode(Message.self, from: data)
 
-					if let xhrResponse = xhr.urlResponse {
-						continuation.yield((xhr.body, xhrResponse))
-					}
+				if let xhrResponse = xhr.urlResponse {
+					continuation.yield((xhr.body, xhrResponse))
 				}
-				catch {
-					logger.error("Error handling '\(message.name)' message: \(body): \(error)")
-				}
-
-			default:
-				logger.notice("Received unexpected message '\(message.name)' message: \(body)")
 			}
+			catch {
+				// NOTE: this error typically represents an unexpected change
+				// within this library (either the ``Message`` struct, or the
+				// JavaScript that builds it), and should not be thrown.
+				logger.error("Error handling '\(message.name)' message: \(body): \(error)")
+			}
+
+		default:
+			// NOTE: this enables the capture of new messages, should they be
+			// added, which makes things easier to debug. It should not be seen
+			// in the wild, as the messages that may be received are fixed.
+			logger.notice("Received unexpected message '\(message.name)' message: \(body)")
+		}
 	}
 
 	// MARK: Javascript
