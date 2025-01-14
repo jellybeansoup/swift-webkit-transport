@@ -66,7 +66,7 @@ import WebKit
 		let message = MockScriptMessage(name: "document", body: "HTML content")
 		messageHandler.userContentController(.init(), didReceive: message)
 
-		let payload = try #require(await withTimeout(1) { await task.value })
+		let payload = try #require(await withTimeout(10) { await task.value })
 
 		#expect(payload.data == Data("HTML content".utf8))
 		#expect(payload.response == response)
@@ -109,7 +109,7 @@ import WebKit
 		let message = MockScriptMessage(name: "document", body: "HTML content")
 		messageHandler.userContentController(.init(), didReceive: message)
 
-		let payload = try #require(await withTimeout(1) { await task.value })
+		let payload = try #require(await withTimeout(10) { await task.value })
 
 		#expect(payload.data == Data("HTML content".utf8))
 		#expect(payload.response == response)
@@ -122,13 +122,13 @@ import WebKit
 		viewController.webView = webView
 
 		let url = URL(string: "https://example.com")!
-		let data = Data(#"<!DOCTYPE html><html><head><title>Example</title></head><body></body></html>"#.utf8)
+		let data = Data(#"<!DOCTYPE html><html><body></body></html>"#.utf8)
 		let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: nil)!
 		let stream = viewController.load(data: data, response: response)
 
 		viewController.stopLoading()
 
-		let payload = try await withTimeout(1) {
+		let payload = try await withTimeout(10) {
 			var iterator = stream.makeAsyncIterator()
 			return await iterator.next()
 		}

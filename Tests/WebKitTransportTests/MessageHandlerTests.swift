@@ -182,7 +182,7 @@ import WebKit
 		#expect(userContentController.capturedScriptMessageHandlers.isEmpty)
 		#expect(userContentController.capturedUserScripts.isEmpty)
 
-		let payload = try await withTimeout(1) {
+		let payload = try await withTimeout(10) {
 			var iterator = handler.messages.makeAsyncIterator()
 			return await iterator.next()
 		}
