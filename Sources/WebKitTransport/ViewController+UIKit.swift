@@ -2,7 +2,7 @@
 import UIKit
 import WebKit
 
-final class ViewController: UIViewController {
+final class ViewController: UIViewController, ViewControllerProtocol {
 
 	/// The window that the `WebViewController` appears in.
 	lazy var window: UIWindow = {
@@ -48,8 +48,13 @@ final class ViewController: UIViewController {
 			using: response
 		)
 
-		window.frame = CGRect(x: -320.0, y: 0, width: 320.0, height: 568.0 * 3)
 		window.isHidden = false
+		window.frame = CGRect(
+			x: -320.0,
+			y: 0,
+			width: 320.0,
+			height: 568.0 * 3
+		)
 
 		webView.load(
 			data,

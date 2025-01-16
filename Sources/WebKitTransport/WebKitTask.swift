@@ -9,11 +9,11 @@ public struct WebKitTask: AsyncSequence, Sendable {
 
 	public typealias Payload = (data: Data, response: URLResponse)
 
-	private let underlyingStream: AsyncStream<Payload>
+	let underlyingStream: AsyncStream<Payload>
 
-	private let underlyingTask: Task<Void, Never>?
+	let underlyingTask: Task<Void, Never>?
 
-	private init(
+	init(
 		stream: AsyncStream<Payload>,
 		task: Task<Void, Never>? = nil
 	) {
@@ -21,14 +21,19 @@ public struct WebKitTask: AsyncSequence, Sendable {
 		self.underlyingTask = task
 	}
 
-	private init(request: URLRequest, session: URLSession, timeout: TimeInterval) async throws {
+	init(
+		request: URLRequest,
+		session: URLSessionProtocol,
+		timeout: TimeInterval,
+		viewControllerProvider: @MainActor @escaping @Sendable () -> ViewControllerProtocol
+	) async throws {
 		let payload: (data: Data, response: URLResponse) = try await session.data(for: request)
 
 		if let httpError = payload.response.httpError {
 			throw httpError
 		}
 		else if !payload.data.isEmpty, payload.response.mimeType == "text/html" {
-			self.init(data: payload.data, response: payload.1, timeout: timeout)
+			self.init(data: payload.data, response: payload.response, timeout: timeout, viewControllerProvider: viewControllerProvider)
 		}
 		else {
 			self.init(stream: .init {
@@ -38,11 +43,16 @@ public struct WebKitTask: AsyncSequence, Sendable {
 		}
 	}
 
-	private init(data: Data, response: URLResponse, timeout: TimeInterval) {
+	init(
+		data: Data,
+		response: URLResponse,
+		timeout: TimeInterval,
+		viewControllerProvider: @MainActor @escaping @Sendable () -> ViewControllerProtocol
+	) {
 		var continuation: AsyncStream<Payload>.Continuation!
 		self.underlyingStream = .init { continuation = $0 }
 		self.underlyingTask = Task.detached { [continuation] in
-			let viewController = await ViewController()
+			let viewController = await viewControllerProvider()
 			let stream = await viewController.load(data: data, response: response)
 
 			var timeoutTask: Task<Void, Never>?
@@ -59,7 +69,7 @@ public struct WebKitTask: AsyncSequence, Sendable {
 		}
 	}
 
-	private static func stopLoading(_ viewController: ViewController, after seconds: TimeInterval) -> Task<Void, Never> {
+	private static func stopLoading(_ viewController: ViewControllerProtocol, after seconds: TimeInterval) -> Task<Void, Never> {
 		Task.detached { [weak viewController] in
 			if #available(iOS 16.0, macOS 13.0, *) {
 				try? await Task.sleep(for: .seconds(seconds))
@@ -97,7 +107,9 @@ public struct WebKitTask: AsyncSequence, Sendable {
 	/// - Returns: A `WebKitTask` instance that streams the loaded content.
 	/// - Throws: An error if the request fails or if the response indicates an HTTP error.
 	public static func load(_ url: URL, using session: URLSession = .shared, timeout: TimeInterval = Self.defaultTimeout) async throws -> Self {
-		try await Self.init(request: URLRequest(url: url), session: session, timeout: timeout)
+		try await Self.init(request: URLRequest(url: url), session: session, timeout: timeout) {
+			ViewController()
+		}
 	}
 
 	/// Loads web content from the specified ``URLRequest``.
@@ -119,7 +131,9 @@ public struct WebKitTask: AsyncSequence, Sendable {
 	/// - Returns: A `WebKitTask` instance that streams the loaded content.
 	/// - Throws: An error if the request fails or if the response indicates an HTTP error.
 	public static func load(_ request: URLRequest, using session: URLSession = .shared, timeout: TimeInterval = Self.defaultTimeout) async throws -> Self {
-		try await Self.init(request: request, session: session, timeout: timeout)
+		try await Self.init(request: request, session: session, timeout: timeout) {
+			ViewController()
+		}
 	}
 
 	/// Loads web content directly from raw data and response objects.
@@ -146,7 +160,9 @@ public struct WebKitTask: AsyncSequence, Sendable {
 	///   - timeout: The timeout interval for the task, in seconds. Defaults to `defaultTimeout`.
 	/// - Returns: A `WebKitTask` instance that streams the loaded content.
 	public static func load(data: Data, response: URLResponse, timeout: TimeInterval = Self.defaultTimeout) -> Self {
-		Self.init(data: data, response: response, timeout: timeout)
+		Self.init(data: data, response: response, timeout: timeout) {
+			ViewController()
+		}
 	}
 
 	/// Cancels the underlying task, stopping any ongoing processing.
