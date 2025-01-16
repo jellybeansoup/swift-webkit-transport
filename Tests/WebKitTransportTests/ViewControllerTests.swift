@@ -66,7 +66,7 @@ import WebKit
 		let message = MockScriptMessage(name: "document", body: "HTML content")
 		messageHandler.userContentController(.init(), didReceive: message)
 
-		let payload = try #require(await withTimeout(10) { await task.value })
+		let payload = try #require(await task.value)
 
 		#expect(payload.data == Data("HTML content".utf8))
 		#expect(payload.response == response)
@@ -109,7 +109,7 @@ import WebKit
 		let message = MockScriptMessage(name: "document", body: "HTML content")
 		messageHandler.userContentController(.init(), didReceive: message)
 
-		let payload = try #require(await withTimeout(10) { await task.value })
+		let payload = try #require(await task.value)
 
 		#expect(payload.data == Data("HTML content".utf8))
 		#expect(payload.response == response)
@@ -126,15 +126,26 @@ import WebKit
 		let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: nil)!
 		let stream = viewController.load(data: data, response: response)
 
+		// Grab the message handler before it's cleared by `stopLoading`.
+		let messageHandler = try #require(viewController.messageHandler)
+
 		viewController.stopLoading()
 
-		let payload = try await withTimeout(10) {
-			var iterator = stream.makeAsyncIterator()
-			return await iterator.next()
+		#expect(viewController.messageHandler == nil)
+
+		// Sending a valid message to the message handler forces it to emit, but this should be ignored.
+		let message = MockScriptMessage(name: "document", body: "HTML content")
+		messageHandler.userContentController(.init(), didReceive: message)
+
+		let task = Task<WebKitTask.Payload?, Never> {
+			for await payload in stream {
+				return payload
+			}
+
+			return nil
 		}
 
-		#expect(payload == nil)
-		#expect(viewController.messageHandler == nil)
+		#expect(await task.value == nil)
 
 		#expect(webView.stopLoadingWasCalled == true)
 

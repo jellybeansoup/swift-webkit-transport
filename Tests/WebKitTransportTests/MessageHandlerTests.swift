@@ -104,6 +104,7 @@ import WebKit
 			return nil
 		}
 
+		// This message will be ignored because the body cannot be parsed as a `Message`
 		let message = MockScriptMessage(name: "xhr", body: "{}")
 		handler.userContentController(userContentController, didReceive: message)
 
@@ -131,6 +132,7 @@ import WebKit
 			return nil
 		}
 
+		// This message will be ignored because the name is an invalid value
 		let invalidMessage = MockScriptMessage(name: "INVALID", body: "")
 		handler.userContentController(userContentController, didReceive: invalidMessage)
 
@@ -158,6 +160,7 @@ import WebKit
 			return nil
 		}
 
+		// This message will be ignored because the body is an invalid type
 		let invalidMessage = MockScriptMessage(name: "document", body: 123)
 		handler.userContentController(userContentController, didReceive: invalidMessage)
 
@@ -177,17 +180,24 @@ import WebKit
 		let response = urlResponse()
 		let handler = MessageHandler(for: userContentController, using: response)
 
+		let task = Task<WebKitTask.Payload?, Never> {
+			for await payload in handler.messages {
+				return payload
+			}
+
+			return nil
+		}
+
 		handler.finish()
 
 		#expect(userContentController.capturedScriptMessageHandlers.isEmpty)
 		#expect(userContentController.capturedUserScripts.isEmpty)
 
-		let payload = try await withTimeout(10) {
-			var iterator = handler.messages.makeAsyncIterator()
-			return await iterator.next()
-		}
+		// Sending a valid message forces the stream to emit, but this should be ignored
+		let documentMessage = MockScriptMessage(name: "document", body: "HTML content")
+		handler.userContentController(userContentController, didReceive: documentMessage)
 
-		#expect(payload == nil)
+		#expect(await task.value == nil)
 	}
 
 }
