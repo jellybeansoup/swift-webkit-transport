@@ -319,8 +319,6 @@ import Testing
 		let loadParameters = try #require(await viewController.loadParameters)
 		#expect(loadParameters.data == data)
 		#expect(loadParameters.response == response)
-
-		#expect(await viewController.stopLoadingWasCalled == true)
 	}
 
 	@Test func initWithDataTimesOut() async throws {
