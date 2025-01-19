@@ -1,3 +1,8 @@
+// Copyright (c) 2025 Daniel Farrelly
+// Licensed under BSD 2-Clause "Simplified" License
+//
+// See the LICENSE file for license information
+
 import Foundation
 
 /// Structure that represents the details of a XHR request performed within the `webView`.
