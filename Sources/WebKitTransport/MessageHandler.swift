@@ -86,57 +86,10 @@ final class MessageHandler: NSObject, WKScriptMessageHandler {
 
 	// MARK: Javascript
 
-	static let javascript: String = """
-		var xhrInFlight = 0
-
-		function xhrDidFinish() {
-			xhrInFlight -= 1;
-		}
-
-		var open = XMLHttpRequest.prototype.open;
-		XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-			xhrInFlight += 1;
-
-			this.addEventListener("load", function() {
-				var body = this.responseText.trim();
-
-				if (body.length == 0) { return } // Nothing to parse if the body is empty
-
-				webkit.messageHandlers.xhr.postMessage(JSON.stringify({
-					"url": this.responseURL,
-					"status": this.status,
-					"headers": this.getAllResponseHeaders().trim(),
-					"body": body
-				}));
-			});
-
-			this.addEventListener("load", xhrDidFinish);
-			this.addEventListener("error", xhrDidFinish);
-			this.addEventListener("abort", xhrDidFinish);
-
-			open.apply(this, arguments);
-		};
-
-		var previousHTML = ""
-		function callback() {
-			if (xhrInFlight > 0) { return }
-			if (document.readyState !== "complete") { return }
-			if (document.querySelector("meta[http-equiv='refresh']") !== null) { return }
-			let html = window.document.documentElement.outerHTML;
-			if (html === previousHTML) { return }
-			clearInterval(checkDocumentLoaded);
-			webkit.messageHandlers.document.postMessage(html);
-		}
-
-		var observer = new MutationObserver(callback);
-
-		observer.observe(window.document.documentElement, {
-			childList: true,
-			attributes: true,
-			subtree: true
-		});
-
-		var checkDocumentLoaded = setInterval(callback, 100);
-		"""
+	static let javascript: String = {
+		let javascript = String(bytes: PackageResources.MessageHandler_js, encoding: .utf8)
+		precondition(javascript != nil && javascript?.isEmpty == false, "Cannot decode the source for MessageHandler.js")
+		return javascript ?? ""
+	}()
 
 }

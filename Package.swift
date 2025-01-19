@@ -15,7 +15,10 @@ let package = Package(
     ],
     targets: [
         .target(
-			name: "WebKitTransport"
+			name: "WebKitTransport",
+			resources: [
+				.embedInCode("MessageHandler.js"),
+			]
 		),
         .testTarget(
             name: "WebKitTransportTests",
