@@ -360,6 +360,29 @@ import Testing
 		#expect(await viewController.stopLoadingWasCalled == true)
 	}
 
+	@Test func stopLoading() async throws {
+		let viewController = await MockViewController()
+
+		// Cancelling the task DOES NOT stop loading
+
+		let taskForCancelling = WebKitTask.stopLoading(viewController, after: 0.5)
+		taskForCancelling.cancel()
+
+		await taskForCancelling.value
+
+		#expect(taskForCancelling.isCancelled)
+		#expect(await viewController.stopLoadingWasCalled == false)
+
+		// Allowing the task to complete DOES stop loading
+
+		let taskForCompleting = WebKitTask.stopLoading(viewController, after: 0.5)
+
+		await taskForCompleting.value
+
+		#expect(taskForCompleting.isCancelled == false)
+		#expect(await viewController.stopLoadingWasCalled == true)
+	}
+
 	@Test func cancel() async throws {
 		var continuation: AsyncStream<WebKitTask.Payload>.Continuation!
 		let underlyingStream = AsyncStream<WebKitTask.Payload> { continuation = $0 }
