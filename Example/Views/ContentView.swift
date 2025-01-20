@@ -62,8 +62,6 @@ struct ContentView: View {
 			URLField(url: $viewModel.url)
 				#if os(macOS)
 				.frame(minWidth: 290, idealWidth: width * 0.6)
-				#else
-				.frame(width: 290)
 				#endif
 		}
 

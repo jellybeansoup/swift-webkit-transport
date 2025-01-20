@@ -11,7 +11,9 @@ struct ExampleApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
+				#if os(macOS)
 				.frame(minWidth: 480, minHeight: 320)
+				#endif
 		}
 	}
 
