@@ -71,7 +71,7 @@ struct ContentView: View {
 			} label: {
 				Label("Reload", systemImage: "arrow.clockwise")
 			}
-			.disabled(viewModel.isLoading)
+			.disabled(viewModel.url == nil || viewModel.isLoading)
 		}
 	}
 
