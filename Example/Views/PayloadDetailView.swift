@@ -59,9 +59,7 @@ struct PayloadDetailView: View {
 					.padding(8)
 					.frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .leading)
 
-					Rectangle()
-						.fill(Color.primary.tertiary)
-						.frame(height: 1)
+					Separator()
 				}
 				.background(Material.bar)
 			}
