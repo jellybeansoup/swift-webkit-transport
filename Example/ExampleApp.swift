@@ -15,6 +15,7 @@ struct ExampleApp: App {
 				.frame(minWidth: 480, minHeight: 320)
 				#endif
 		}
+		.environment(\.transport, .live)
 	}
 
 }

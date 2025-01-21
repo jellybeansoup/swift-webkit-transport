@@ -10,6 +10,7 @@
 		A1649A852D3B1BC800656918 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1649A802D3B1BC800656918 /* Assets.xcassets */; };
 		A1649A8D2D3B1F4E00656918 /* WebKitTransport in Frameworks */ = {isa = PBXBuildFile; productRef = A1649A8C2D3B1F4E00656918 /* WebKitTransport */; };
 		A1AA3A882D3C83B7004177D6 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AA3A842D3C83B7004177D6 /* ExampleApp.swift */; };
+		A1AA3AEB2D3F7813004177D6 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AA3AEA2D3F7813004177D6 /* Transport.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +19,7 @@
 		A1649A902D3B340A00656918 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A175D3972D3B1A5F00392872 /* WebKitTransportExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WebKitTransportExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1AA3A842D3C83B7004177D6 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
+		A1AA3AEA2D3F7813004177D6 /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -29,11 +31,6 @@
 		A1AA3A932D3CBA6E004177D6 /* Model */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Model;
-			sourceTree = "<group>";
-		};
-		A1AA3A972D3CE83E004177D6 /* ViewModels */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		A1AA3A9F2D3CF3D8004177D6 /* Previews */ = {
@@ -69,8 +66,8 @@
 			isa = PBXGroup;
 			children = (
 				A1AA3A842D3C83B7004177D6 /* ExampleApp.swift */,
+				A1AA3AEA2D3F7813004177D6 /* Transport.swift */,
 				A1AA3A932D3CBA6E004177D6 /* Model */,
-				A1AA3A972D3CE83E004177D6 /* ViewModels */,
 				A1AA3A9F2D3CF3D8004177D6 /* Previews */,
 				A175D3992D3B1A5F00392872 /* Views */,
 				A1649A832D3B1BC800656918 /* Supporting Files */,
@@ -104,7 +101,6 @@
 			fileSystemSynchronizedGroups = (
 				A175D3992D3B1A5F00392872 /* Views */,
 				A1AA3A932D3CBA6E004177D6 /* Model */,
-				A1AA3A972D3CE83E004177D6 /* ViewModels */,
 				A1AA3A9F2D3CF3D8004177D6 /* Previews */,
 			);
 			name = WebKitTransportExample;
@@ -168,6 +164,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1AA3AEB2D3F7813004177D6 /* Transport.swift in Sources */,
 				A1AA3A882D3C83B7004177D6 /* ExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
