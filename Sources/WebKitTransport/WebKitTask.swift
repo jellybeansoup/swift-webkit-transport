@@ -98,19 +98,19 @@ public struct WebKitTask: AsyncSequence, Sendable {
 	/// Loads web content from the specified ``URL``
 	///
 	/// This method loads the initial page content using the given `session`. The response is then loaded
-	/// into a ``WKWebView`` which allows the page's JavaScript to run. Additional responses from in-page
-	/// XMLHttpRequests are captured and emitted, as follows:
+	/// into a ``WKWebView`` which allows the page's JavaScript to run. Responses from in-page XMLHttpRequests,
+	/// along with document mutations, are captured and emitted, as follows:
 	/// ```swift
 	/// let url = URL(string: "https://example.com")!
-	/// for try await (data, response) in WebKitTask.load(url) {
+	/// for await (data, response) in try await WebKitTask.load(url) {
 	///	    // Process incoming data and response
-	///	    // The first response will always be the response from the underlying URLSession call.
 	/// }
 	/// ```
 	/// - Parameters:
 	///   - url: The URL to load.
 	///   - session: The `URLSession` instance to use for the request. Defaults to `.shared`.
 	///   - timeout: The timeout interval for the task, in seconds. Defaults to `defaultTimeout`.
+	///   	The timeout is internally reset to the given number of seconds each time a payload is received.
 	/// - Returns: A `WebKitTask` instance that streams the loaded content.
 	/// - Throws: An error if the request fails or if the response indicates an HTTP error.
 	public static func load(_ url: URL, using session: URLSession = .shared, timeout: TimeInterval = Self.defaultTimeout) async throws -> Self {
@@ -120,19 +120,19 @@ public struct WebKitTask: AsyncSequence, Sendable {
 	/// Loads web content from the specified ``URLRequest``.
 	///
 	/// This method loads the initial page content using the given `session`. The response is then loaded
-	/// into a ``WKWebView`` which allows the page's JavaScript to run. Additional responses from in-page
-	/// XMLHttpRequests are captured and emitted, as follows:
+	/// into a ``WKWebView`` which allows the page's JavaScript to run. Responses from in-page XMLHttpRequests,
+	/// along with document mutations, are captured and emitted, as follows:
 	/// ```swift
 	/// let request = URLRequest(url: URL(string: "https://example.com")!)
-	/// for try await (data, response) in WebKitTask.load(request) {
+	/// for await (data, response) in try await WebKitTask.load(request) {
 	///	    // Process incoming data and response
-	///	    // The first response will always be the response from the underlying URLSession call.
 	/// }
 	/// ```
 	/// - Parameters:
 	///   - request: The `URLRequest` to load.
 	///   - session: The `URLSession` instance to use for the request. Defaults to `.shared`.
 	///   - timeout: The timeout interval for the task, in seconds. Defaults to `defaultTimeout`.
+	///   	The timeout is internally reset to the given number of seconds each time a payload is received.
 	/// - Returns: A `WebKitTask` instance that streams the loaded content.
 	/// - Throws: An error if the request fails or if the response indicates an HTTP error.
 	public static func load(_ request: URLRequest, using session: URLSession = .shared, timeout: TimeInterval = Self.defaultTimeout) async throws -> Self {
@@ -142,8 +142,8 @@ public struct WebKitTask: AsyncSequence, Sendable {
 	/// Loads web content directly from raw data and response objects.
 	///
 	/// The given data and response is then loaded into a ``WKWebView`` which allows the page's
-	/// JavaScript to run. Additional responses from in-page XMLHttpRequests are captured and emitted,
-	/// as follows:
+	/// JavaScript to run. Responses from in-page XMLHttpRequests, along with document mutations,
+	/// are captured and emitted, as follows:
 	/// ```swift
 	/// let inputData = Data(#"<!DOCTYPE html><html>...</html>"#.utf8)
 	/// let inputResponse = URLResponse(
@@ -154,13 +154,13 @@ public struct WebKitTask: AsyncSequence, Sendable {
 	/// )
 	/// for try await (data, response) in WebKitTask.load(data: data, response: response) {
 	///	    // Process incoming data and response
-	///	    // The first response will always be the provided content.
 	/// }
 	/// ```
 	/// - Parameters:
 	///   - data: The raw data of the content.
 	///   - response: The `URLResponse` associated with the data.
 	///   - timeout: The timeout interval for the task, in seconds. Defaults to `defaultTimeout`.
+	///   	The timeout is internally reset to the given number of seconds each time a payload is received.
 	/// - Returns: A `WebKitTask` instance that streams the loaded content.
 	public static func load(data: Data, response: URLResponse, timeout: TimeInterval = Self.defaultTimeout) -> Self {
 		Self.init(data: data, response: response, timeout: timeout) { ViewController() }
