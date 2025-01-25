@@ -3,7 +3,7 @@
 //
 // See the LICENSE file for license information
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !canImport(UIKit)
 import AppKit
 import WebKit
 

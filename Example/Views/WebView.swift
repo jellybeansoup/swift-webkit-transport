@@ -6,27 +6,7 @@
 import SwiftUI
 import WebKit
 
-#if canImport(AppKit)
-struct WebView: NSViewRepresentable {
-
-	let payload: Payload
-
-	init(payload: Payload) {
-		self.payload = payload
-	}
-
-	func makeCoordinator() -> Coordinator {
-		.init()
-	}
-
-	func makeNSView(context: Context) -> WKWebView {
-		makeWebView(loading: payload, coordinator: context.coordinator)
-	}
-
-	func updateNSView(_ webView: WKWebView, context: Context) {}
-
-}
-#elseif canImport(UIKit)
+#if canImport(UIKit)
 struct WebView: UIViewRepresentable {
 
 	let payload: Payload
@@ -44,6 +24,26 @@ struct WebView: UIViewRepresentable {
 	}
 
 	func updateUIView(_ webView: WKWebView, context: Context) {}
+
+}
+#elseif canImport(AppKit)
+struct WebView: NSViewRepresentable {
+
+	let payload: Payload
+
+	init(payload: Payload) {
+		self.payload = payload
+	}
+
+	func makeCoordinator() -> Coordinator {
+		.init()
+	}
+
+	func makeNSView(context: Context) -> WKWebView {
+		makeWebView(loading: payload, coordinator: context.coordinator)
+	}
+
+	func updateNSView(_ webView: WKWebView, context: Context) {}
 
 }
 #endif
